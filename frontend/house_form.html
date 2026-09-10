@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini House-Price Prediction</title>
+</head>
+<body>
+    <h2>House Price Predictor</h2>
+    <form id="houseForm">
+        <div>
+            <label for="area">Area (m²):</label>
+            <input type="number" id="area" step="0.1" min="0" required>
+        </div>
+        <br>
+        <div>
+            <label for="bedrooms">Bedrooms:</label>
+            <input type="number" id="bedrooms" min="0" required>
+        </div>
+        <br>
+        <div>
+            <label for="location">Location:</label>
+            <select id="location">
+                <option value="hanoi">Hà Nội</option>
+                <option value="hcmc">TP Hồ Chí Minh</option>
+                <option value="other">Khác</option>
+            </select>
+        </div>
+        <br>
+        <button type="submit">Predict Price</button>
+    </form>
+
+    <h3 id="result" style="color: blue;"></h3>
+
+    <script>
+        document.getElementById("houseForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Ngăn trang bị reload
+            
+            const area = document.getElementById("area").value;
+            const bedrooms = document.getElementById("bedrooms").value;
+            const location = document.getElementById("location").value;
+            
+            const resultElement = document.getElementById("result");
+            resultElement.innerText = "Đang tính toán...";
+
+            try {
+                // Lệnh fetch() được gọi trực tiếp ở đây
+                const response = await fetch(`/predict?area=${area}&bedrooms=${bedrooms}&location=${location}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Lỗi server: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                resultElement.innerText = `Giá dự đoán: ${data.predicted_price.toLocaleString('vi-VN')} VND`;
+                
+            } catch (error) {
+                console.error("Error:", error);
+                resultElement.innerText = "Có lỗi xảy ra khi dự đoán giá. Vui lòng thử lại.";
+            }
+        });
+    </script>
+</body>
+</html>
